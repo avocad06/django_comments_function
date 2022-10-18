@@ -3,7 +3,9 @@
   {% for article in articles %}
     <div class="card" style="width: 18rem;">
       <div class="card-body">
-        <h5 class="card-title">{{ article.title }}</h5>
+        <a href="{% url 'articles:detail' article.pk %}">
+          <h5 class="card-title">{{ article.title }}</h5>
+        </a>
         <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p>
         <a href="#" class="card-link">Card link</a>
         <a href="#" class="card-link">Another link</a>
