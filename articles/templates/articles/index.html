@@ -1,4 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>오류없이 동작합니다.</h1>
+  {% for article in articles %}
+    <div class="card" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ article.title }}</h5>
+        <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p>
+        <a href="#" class="card-link">Card link</a>
+        <a href="#" class="card-link">Another link</a>
+      </div>
+    </div>
+  {% endfor %}
 {% endblock content %}
