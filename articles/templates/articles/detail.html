@@ -20,6 +20,10 @@
         <p>
           <span class="fw-bold">{{ comment.pk }}번째 댓글입니다.</span>
           <span>{{comment.content }}</span>
+          <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="삭제" class="btn btn-outline-danger">
+          </form>
         </p>
       {% endfor %}
     </p>
