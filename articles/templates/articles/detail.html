@@ -15,16 +15,24 @@
         <input type="submit" class="btn btn-outline-primary">
       </form>
     </p>
+    <h4>댓글 목록</h4>
+    {% if article.comment_set.all %}
+      <p>{{ article.comment_set.all |length }}개의 댓글을 확인하세요.</p>
+      <p>다시 한번
+        {{ comments.count }}개의 댓글을 확인하세요.</p>
+    {% endif %}
     <p>
       {% for comment in article.comment_set.all %}
         <p>
-          <span class="fw-bold">{{ comment.pk }}번째 댓글입니다.</span>
           <span>{{comment.content }}</span>
+          <hr>
           <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST">
             {% csrf_token %}
             <input type="submit" value="삭제" class="btn btn-outline-danger">
           </form>
         </p>
+        {% empty%}
+        <p>첫 번째 댓글의 주인공이 되어보세요.</p>
       {% endfor %}
     </p>
   </div>
