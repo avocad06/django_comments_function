@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Article
+from .forms import NewPostForm, NewCommentForm
 
 # Create your views here.
 def index(request):
@@ -15,3 +16,18 @@ def detail(request, article_pk):
         "article" : article,
     }
     return render(request, "articles/detail.html", context)
+
+def create(request):
+    if request.method == "POST":
+        forms = NewPostForm(request.POST)
+        if forms.is_valid():
+            forms.save()
+            pk = Article.objects.all(-pk)[0]
+            return redirect('articles:detail', pk)
+    
+    else:
+        forms = NewPostForm
+    context = {
+        "forms" : forms,
+    }
+    return render(request, 'articles/create.html', context)
