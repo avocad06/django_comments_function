@@ -7,7 +7,7 @@
           <h5 class="card-title">{{ article.title }}</h5>
         </a>
         <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p>
-        <a href="#" class="card-link">Card link</a>
+        <a href="{% url 'articles:create' %}" class="card-link">새 글 쓰러가기</a>
         <a href="#" class="card-link">Another link</a>
       </div>
     </div>
