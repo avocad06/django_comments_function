@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Article
+from .models import Article, Comment
 from .forms import NewPostForm, NewCommentForm
 
 # Create your views here.
@@ -42,3 +42,8 @@ def comment_create(request, article_pk):
         comment.article = article
         comment.save()
     return redirect('articles:detail', article.pk)
+
+def comment_delete(request, article_pk, comment_pk):
+    comment = Comment.objects.get(pk=comment_pk)
+    comment.delete()
+    return redirect('articles:detail', article_pk)
