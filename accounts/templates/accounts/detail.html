@@ -1,7 +1,42 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load django_bootstrap5 %}
 {% block content %}
-  {% for article in user.article_set.all %}
-    {{ article.title }}
-  {% endfor %}
+{% comment %} 프로필 {% endcomment %}
+<header class="d-flex">
+  <div class="">
+    <img src="" alt="">
+  </div>
+  <div class="container">
+    <p class="fw-bold">{{ us }} </p>
+    <p>{{ us.email }}</p>
+  </div>
+
+
+</header>
+<hr>
+  <div class="container p-3 d-flex flex-column align-items-center" style="background-color: #f9f9f9;">
+    <p class="fw-bold text-primary mb-1">{{ user.article_set.all | length }}</p>
+    <p class="fw-bold">작성한 글</p>
+    {% for article in user.article_set.all %}
+      <div class="card mb-3 shadow-sm col" style="border-style: none; width: 30rem;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="..." class="img-fluid rounded-start" alt="...">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <a href="{% url 'articles:detail' article.pk %}" class="text-decoration-none hver">
+                <h5 class="fw-bold card-title">{{ article.title }}</h5>
+              </a>
+              <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p>
+              <p class="card-text">
+                <small class="text-muted">Last updated 3 mins ago</small>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock %}
