@@ -23,4 +23,7 @@ def login(request):
     
     else:
         return HttpResponseForbidden()
-        
+
+def logout(request):
+    auth_logout(request)
+    return redirect("articles:index")
