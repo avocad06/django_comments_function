@@ -39,10 +39,14 @@ def create(request):
 def comment_create(request, article_pk):
     article = Article.objects.get(pk=article_pk)
     comment_form = NewCommentForm(request.POST)
+    print(dir(request))
     if comment_form.is_valid():
+        # 이 시점에는 모델폼의 인스턴스, 객체를 반환
         comment = comment_form.save(commit=False)
-        comment.article = article
+        # 이 시점에서는 모델의 인스턴스를 반환
+        comment.article_id = article.pk
         comment.save()
+        print(comment)
     return redirect('articles:detail', article.pk)
 
 def comment_delete(request, article_pk, comment_pk):
