@@ -27,3 +27,7 @@ def login(request):
 def logout(request):
     auth_logout(request)
     return redirect("articles:index")
+
+def detail(request, user_pk):
+    us = get_user_model().objects.get(pk=user_pk)
+    return render(request, "accounts/detail.html", {"us": us})

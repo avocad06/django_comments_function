@@ -1,0 +1,9 @@
+.hver {
+    color : #353535;
+    text-decoration: none;
+}
+
+.hver:hover {
+    font-weight: bold;
+    color : #adb5bd;
+}

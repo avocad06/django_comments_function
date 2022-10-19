@@ -25,8 +25,10 @@ def create(request):
     if request.method == "POST":
         forms = NewPostForm(request.POST)
         if forms.is_valid():
-            forms.save()
-            pk = Article.objects.all(-pk)[0]
+            article = forms.save(commit=False)
+            article.user = request.user
+            article.save()
+            pk = Article.objects.order_by("-pk")[0].pk
             return redirect('articles:detail', pk)
     
     else:
