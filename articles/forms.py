@@ -1,3 +1,4 @@
+from cProfile import label
 from django import forms
 from .models import Article, Comment
 
@@ -12,3 +13,6 @@ class NewCommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ("content",)
+        labels = {
+            'content' : '',
+        }
