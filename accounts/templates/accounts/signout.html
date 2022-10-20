@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% block content %}
+  <div class="p-0 w-50 container d-flex justify-content-center align-items-center " style="height: 100vh;  background-color: #f9f9f9;">
+    <div class="card p-5 w-100" style="border-style: none;">
+      <p class="fw-bold display-6">회원가입</p>
+      <form action="" method="POST">
+        {% csrf_token %}
+        {% bootstrap_form forms %}
+        <div class="d-grid">
+          <input type="submit" value="가입하기" class="btn btn-primary">
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
