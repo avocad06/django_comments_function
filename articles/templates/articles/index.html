@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
+  {% if request.user.is_authenticated %}
+    <a href="{% url 'accounts:detail' user.pk %}">
+      {{ request.user }}
+    </a>
+  {% endif %}
   {% for article in articles %}
     <div class="card" style="width: 18rem;">
       <div class="card-body">
