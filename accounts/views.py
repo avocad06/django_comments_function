@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from .forms import SignoutForm
 
@@ -54,5 +55,20 @@ def signout(request):
             }
         return render(request, "accounts/signout.html", context)
     
+    else:
+        return HttpResponseForbidden()
+
+@login_required
+def follow(request, user_pk):
+    user = get_user_model()
+    us = get_object_or_404(user, pk=user_pk)
+    if not request.user == us:
+        if request.user in us.follower.all():
+            print("no")
+            us.follower.remove(request.user)
+        else:
+            print("yes")
+            us.follower.add(request.user)
+        return redirect('accounts:detail', user_pk)
     else:
         return HttpResponseForbidden()
