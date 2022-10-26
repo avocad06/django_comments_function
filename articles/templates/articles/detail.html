@@ -1,52 +1,137 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 {% block content %}
-<div class="container p-5 d-flex flex-column align-items-center" style="background: #f9f9f9;">
-  <div class="card border-0 rounded-3 p-3" style="width: 50rem; min-height: 90vh;">
-    <div class="card-body">
-      <p class="h-5">{{ article.user }}</p>
-      <h2 class="card-title fw-bold">{{ article.title }}</h2>
-      <hr>
-    <p class="card-text" style="height: 15rem;">{{ article.content }}</p>
-    <hr>
-    <h5>댓글 <span class="text-primary fw-bold">{{ article.comment_set.all |length }}</span></h5>
-      <!-- 댓글이 있다면 -->
-        <br>
-    <p>
-      {% for comment in article.comment_set.all %}
-      <p>
-        <p class="fw-bold">{{ comment.user }}</p>
-        <span>{{comment.content }}</span>
-        {% if user == comment.user %}
-        <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" class="d-inline">
-          {% csrf_token %}
-          <input type="submit" value="삭제" class="btn btn-outline-danger">
-        </form>
-        {% endif %}
+  <div class="container p-5 d-flex flex-column align-items-center" style="background: #f9f9f9;">
+    <div class="card border-0 rounded-3 p-3" style="width: 50rem; min-height: 90vh;">
+      <div class="card-body">
+        <p class="h-5">{{ article.user }}</p>
+        <h2 class="card-title fw-bold">{{ article.title }}</h2>
         <hr>
-      </p>
-      <!-- 댓글이 없다면 -->
-      {% empty%}
-        <p style="min-height: 75%;">첫 번째 댓글을 작성해주세요.</p>
-      {% endfor %}
-    </p>
-  </div>
-</div>
-</div>
-<!-- 댓글 작성 폼 -->
-<div class="fixed-bottom d-flex justify-content-center">
-  <div style="width: 50rem;">
-    <form class="d-flex justify-content-center p-2" style="width: 50rem; background-color: #f9f9f9;" action="{% url 'articles:comment_create' article.pk %}" method="POST">
-      {% if not user.is_authenticated %}
-      <input type="text" placeholder="로그인 후 이용해주세요." class="form-control" disabled>
-      {% else %}
-      {% csrf_token %}
-      <input type="text" name="content" class="w-100 form-control" placeholder="댓글을 입력해주세요." style="height: 3rem;">
-      <div class="ms-2 d-flex align-items-center">
-        <input type="submit" class="btn btn-dark h-100" value="등록">
+        <p class="card-text" style="height: 15rem;">{{ article.content }}</p>
+        <hr>
+        <h5>댓글
+          <span class="text-primary fw-bold">{{ article.comment_set.all |length }}</span></h5>
+        <!-- 댓글이 있다면 -->
+        <br>
+        <p>
+          <!-- 새로 axios에 의해 생성되는 div를 담을 div -->
+          <div id="comments"></div>
+          {% for comment in article.comment_set.all %}
+            <p>
+              <p class="fw-bold">{{ comment.user }}
+                <span class="fw-light">{{comment.content }}</span>
+              </p>
+              {% if user == comment.user %}
+                <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" class="d-inline">
+                  {% csrf_token %}
+                  <input type="submit" value="삭제" class="btn btn-outline-danger">
+                </form>
+              {% endif %}
+              <hr>
+            </p>
+            <!-- 댓글이 없다면 -->
+            {% empty%}
+            <p style="min-height: 75%;">첫 번째 댓글을 작성해주세요.</p>
+          {% endfor %}
+        </p>
       </div>
-    </form>
-    {% endif %}
+    </div>
   </div>
-</div>
+  <!-- 댓글 작성 폼 -->
+  <div class="fixed-bottom d-flex justify-content-center">
+    <div style="width: 50rem;">
+      <!-- axios로 요청 보낼 때 가져올 article.pk data-* -->
+      <form id="comment-form" data-article-id="{{ article.pk }}" class="d-flex justify-content-center p-2" style="width: 50rem; background-color: #f9f9f9;">
+        {% if not user.is_authenticated %}
+          <input type="text" placeholder="로그인 후 이용해주세요." class="form-control" disabled="disabled">
+        {% else %}
+          {% csrf_token %}
+          <input type="text" name="content" class="w-100 form-control" placeholder="댓글을 입력해주세요." style="height: 3rem;">
+          <div class="ms-2 d-flex align-items-center">
+            <input type="submit" class="btn btn-dark h-100" value="등록">
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
 {% endblock %}
+{% block script %}
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // form 요소 선택
+    const form = document.querySelector('#comment-form');
+    // hidden으로 숨겨져있는 csrf 선택(공식문서 acquiring the token)
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    // form 요소에 이벤트 핸들러 작성 및 submit 이벤트 취소하기
+    form.addEventListener('submit', function (event) {
+      // submit 이벤트가 발생하면 폼의 기본 속성(보내기)을 취소한다.
+      event.preventDefault();
+      // 요청 보낼 때 필요한 article.pk 가져오기
+      // data 속성 정해줄 때 id를 소문자로 썼지만 자동으로 Id로 되어있음.
+      const articleId = event.target.dataset.articleId;
+      // axios 요청 준비
+      axios({
+        method: 'post',
+        // url 에 작성할 article의 pk는 어떻게 작성해야 할까?
+        // html -> js 로 보내기(data-article-id)
+        // : 사용자 지정 데이터 특성을 만들어 임의의 데이터를 HTML과 DOM사이에서 교환할 수 있는 방법
+        url: `/articles/${event.target.dataset.articleId}/comments/`,
+        // csrf token은 어떻게 보내야 할까?
+        // 먼저 hidden 타입으로 숨겨져있는 csrf 값을 가진 input 태그를 선택해야 한다
+        // ajax로 csrf를 보내는 방법 https://docs.djangoproject.com/en/3.2/ref/csrf/#setting-the-token-on-the-ajax-request
+        //  header에 담아 보낸다.
+        headers: {
+          'X-CSRFToken': csrftoken
+        },
+        // form 에 있는 정보를 data로 넘겨줄 수 있도록 변환
+        data: new FormData(form)
+      })
+      // 요청을 하면
+        .then(response => {
+        // 데이터 응답 객체 확인(json형태)
+        // response 안의 data 안에 context가 있음
+        console.log(response.data)
+        // 댓글을 추가하는 로직
+        // 빈 div(id=comments)
+        const comments = document.querySelector('#comments')
+        // p 태그 형성
+        const p = document.createElement('p')
+        const span = document.createElement('span')
+        // 템플릿에서 보낸 변수
+        p.innerText = `${response.data.userName}`
+        p.classList.add("fw-bold");
+        span.innerText = `  ${response.data.content}`
+        const hr = document.createElement('hr')
+        p.appendChild(span)
+        // 댓글이 쓰인 p 태그를 댓글을 담는 빈 div의 자식요소로 --> x
+        // 어떻게 출력되는지 확인해보자
+        span.classList.add("fw-light")
+        comments.append(p, hr)
+        // reset 명령어가 뭐였지?
+        form.reset();
+      });
+    });
+  </script>
+  <script>
+    const body = document.querySelector('body')
+    const title = document.createElement('NoNE')
+    title.innerText = 'AJAX'
+    body.appendChild(title)
+
+    const URL = "https://jsonplaceholder.typicode.com/todos/1"
+    axios.get(URL)
+      // 응답이 들어오면 받아서 응답 출력해주기
+      .then(res => {
+        const p = document.createElement('p')
+        p.innerText = res.data.title
+        p.classList.add("fw-bold")
+        body.appendChild(p)
+      })
+      .then(data => console.log(data))
+      // 에러가 나면 에러 띄워주기
+      .catch(err => console.log(`${err}!!!`))
+      console.log('안녕하세요!')
+    console.log('내어쓰기입니다!')
+  </script>
+{% endblock script %}
