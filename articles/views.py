@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from .models import Article, Comment
 from .forms import NewPostForm, NewCommentForm
@@ -45,14 +46,21 @@ def comment_create(request, article_pk):
     article = Article.objects.get(pk=article_pk)
     comment_form = NewCommentForm(request.POST)
     if comment_form.is_valid():
-        # 이 시점에는 모델폼의 인스턴스, 객체를 반환
+        # 이 시점에는 모델'폼'의 인스턴스, 객체를 반환
         comment = comment_form.save(commit=False)
-        # 이 시점에서는 모델의 인스턴스를 반환
+        # 이 시점에서는 '모델'의 인스턴스를 반환
         comment.article_id = article.pk
         comment.save()
+        context = {
+            # json으로 응답할 때 담아갈 변수
+            'content' : comment.content,
+            'userName' : comment.user.username,
+        }
+        return JsonResponse(context)
     # 요청이 GET으로 들어오든 POST로 들어오든 게시물 상세페이지로 리디렉트
     # GET으로 들어온다면 46번째 코드까지는 실행(유효성 검사 NOT NULL 탈락)
-    return redirect('articles:detail', article.pk)
+    # return redirect('articles:detail', article.pk)
+    
 
 @login_required
 def comment_delete(request, article_pk, comment_pk):
