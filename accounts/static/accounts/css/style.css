@@ -7,3 +7,18 @@
     font-weight: bold;
     color : #adb5bd;
 }
+
+.header {
+    height: 500px;
+    margin: 0px auto;
+    overflow: hidden;
+}
+
+.header:hover img{
+    transform: scale(1.4);
+}
+
+.header img {
+    width: 100%;
+    transition: all 0.2s linear;
+}
