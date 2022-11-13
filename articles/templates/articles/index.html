@@ -1,157 +1,215 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
   {% if request.user.is_authenticated %}
     <a href="{% url 'accounts:detail' user.pk %}">
       {{ request.user }}
     </a>
   {% endif %}
-  <!-- <div class="all_">
-    <div class="content_">
-      {% for article in articles %}
-      <div class="card" style="width: 18rem;">
-        <div class="card-body">
-          <a href="{% url 'articles:detail' article.pk %}">
-            <h5 class="card-title">{{ article.title }}</h5>
-          </a>
-          <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p>
-          <a href="{% url 'articles:create' %}" class="card-link">새 글 쓰러가기</a>
-          <a href="#" class="card-link">Another link</a>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div> -->
-  
-  
+  <!-- <div class="all_"> <div class="content_"> {% for article in articles %} <div class="card" style="width: 18rem;"> <div class="card-body"> <a href="{% url 'articles:detail' article.pk %}"> <h5 class="card-title">{{ article.title }}</h5> </a> <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p> <a href="{% url 'articles:create' %}" class="card-link">새 글 쓰러가기</a> <a href="#" class="card-link">Another link</a> </div> </div> {% endfor %} </div> </div> -->
+
   <style>
     .showstep1 {
       max-height: 300px;
       overflow: hidden;
     }
-    
+
     .showstep2 {
       max-height: 800px;
       overflow: hidden;
     }
-    
+
     .content {
       height: 1000px;
       background-color: #f4f1de;
     }
-    
+
     .hide {
       display: none;
     }
   </style>
 
+  <div class="header">
+    <img src="{% static '/articles/sea-bg.jpg'%}" alt="">
+  </div>
+
   <div class="detailinfo showstep1">
-    <div class="content"><!-- "실제 컨텐츠 표시 영역" -->
+    <div class="content">
+      <!-- "실제 컨텐츠 표시 영역" -->
       {% for article in articles %}
-      <div class="card" style="width: 18rem;">
-        <div class="card-body">
-          <a href="{% url 'articles:detail' article.pk %}">
-            <h5 class="card-title">{{ article.title }}</h5>
-          </a>
-          <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p>
-          <a href="{% url 'articles:create' %}" class="card-link">새 글 쓰러가기</a>
-          <a href="#" class="card-link">Another link</a>
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <a href="{% url 'articles:detail' article.pk %}">
+              <h5 class="card-title">{{ article.title }}</h5>
+            </a>
+            <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p>
+            <a href="{% url 'articles:create' %}" class="card-link">새 글 쓰러가기</a>
+            <a href="#" class="card-link">Another link</a>
+          </div>
         </div>
-      </div>
-      {% endfor %}</div>
-</div>
-<div class="d-flex justify-content-center">
-  <a href="#" class="btn_open">더보기</a>
-  <a href="#" class="btn_close hide">감추기</a>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function(){ //DOM 생성 후 이벤트 리스너 등록
-    //더보기 버튼 이벤트 리스너
-    document.querySelector('.btn_open').addEventListener('click', function(e){
-        
-        let classList = document.querySelector('.detailinfo').classList; // 더보기 프레임의 클래스 정보 얻기
-        let contentHeight = document.querySelector('.detailinfo > .content').offsetHeight; //컨텐츠 높이 얻기
-
-        // 2단계이면 전체보기로
-        if(classList.contains('showstep2')){
-            classList.remove('showstep2');
-        }
-        // 1단계이면 2단계로
-        if(classList.contains('showstep1')){
-            classList.remove('showstep1');
-            if(contentHeight > 800){
-                classList.add('showstep2');
-            }else{
-                document.querySelector('.btn_open').classList.add('hide');
-            }
-        }
-        //전체보기시 더보기 버튼 감추기 & 감추기 버튼 표시
-        if(!classList.contains('showstep1') && !classList.contains('showstep2')){
-            e.target.classList.add('hide');
-            document.querySelector('.btn_close').classList.remove('hide');
-            
-        }
-        
-    });
-});
-
-// 감추기 버튼 이벤트 리스너
-document.querySelector('.btn_close').addEventListener('click', function(e){
-  e.target.classList.add('hide');
-  document.querySelector('.btn_open').classList.remove('hide'); // 더보기 버튼 감춤
-  document.querySelector('.detailinfo').classList.add('showstep1'); // 초기 감춤 상태로 복귀
-});
-
-//컨텐츠 로딩 완료 후 높이 기준으로 클래스 재처리
-window.addEventListener('load', function(){
-  let contentHeight = document.querySelector('.detailinfo > .content').offsetHeight; //컨텐츠 높이 얻기
-  if(contentHeight <= 300){
-      document.querySelector('.detailinfo').classList.remove('showstep1'); // 초기값보다 작으면 전체 컨텐츠 표시
-      document.querySelector('.btn_open').classList.add('hide'); // 버튼 감춤
-  }
-});
-</script>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="d-flex justify-content-center">
+    <a href="#" class="btn_open">더보기</a>
+    <a href="#" class="btn_close hide">감추기</a>
+  </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function(){
-      document.querySelector('.btn_open').addEventListener('click', function(e){
-        const classList = document.querySelector('.all_').classList;
-        const contentHeight = document.querySelector('.all_ > .content_').offsetHeight;
+    document.addEventListener('DOMContentLoaded', function () { //DOM 생성 후 이벤트 리스너 등록
+      //더보기 버튼 이벤트 리스너
+      document
+        .querySelector('.btn_open')
+        .addEventListener('click', function (e) {
 
-        if(classList.contains('showstep2')){
-          classList.remove('showstep2');
-        }
+          let classList = document
+            .querySelector('.detailinfo')
+            .classList; // 더보기 프레임의 클래스 정보 얻기
+          let contentHeight = document
+            .querySelector('.detailinfo > .content')
+            .offsetHeight; //컨텐츠 높이 얻기
 
-        if(classList.contains('showstpe1')){
-          classList.remove('showstep1');
-          if(contentHeight > 600){
-            classList.add('showstep2');
-          }else{
-            document.querySelector('.btn_open').classList.add('hide');
+          // 2단계이면 전체보기로
+          if (classList.contains('showstep2')) {
+            classList.remove('showstep2');
           }
-        }
+          // 1단계이면 2단계로
+          if (classList.contains('showstep1')) {
+            classList.remove('showstep1');
+            if (contentHeight > 800) {
+              classList.add('showstep2');
+            } else {
+              document
+                .querySelector('.btn_open')
+                .classList
+                .add('hide');
+            }
+          }
+          //전체보기시 더보기 버튼 감추기 & 감추기 버튼 표시
+          if (!classList.contains('showstep1') && !classList.contains('showstep2')) {
+            e
+              .target
+              .classList
+              .add('hide');
+            document
+              .querySelector('.btn_close')
+              .classList
+              .remove('hide');
 
-        if(!classList.contains('showstep1') && !classList.contains('showstep2')){
-          e.target.classList.add('hide');
-          document.querySelector('.btn_close').classList.remove('hide');
-        }
+          }
+
+        });
+    });
+
+    // 감추기 버튼 이벤트 리스너
+    document
+      .querySelector('.btn_close')
+      .addEventListener('click', function (e) {
+        e
+          .target
+          .classList
+          .add('hide');
+        document
+          .querySelector('.btn_open')
+          .classList
+          .remove('hide'); // 더보기 버튼 감춤
+        document
+          .querySelector('.detailinfo')
+          .classList
+          .add('showstep1'); // 초기 감춤 상태로 복귀
       });
-    });
-    
-    document.querySelector('.btn_close').addEventListener('click', function(e){
-      e.target.classList.add('hide');
-      document.querySelector('.btn_open').classList.remove('hide');
-      document.querySelector('.all_').classList.add('showstep1');
-    });
-    
-    window.addEventListener('load', function(){
-      const contentHeight = document.querySelector('.all_ > .content_').offsetHeight;
-      if(contentHeight <= 300){
-        document.querySelector('.all_').classList.remove('showstep1');
-        document.querySelector('.btn_open').classList.add('hide');
+
+    //컨텐츠 로딩 완료 후 높이 기준으로 클래스 재처리
+    window.addEventListener('load', function () {
+      let contentHeight = document
+        .querySelector('.detailinfo > .content')
+        .offsetHeight; //컨텐츠 높이 얻기
+      if (contentHeight <= 300) {
+        document
+          .querySelector('.detailinfo')
+          .classList
+          .remove('showstep1'); // 초기값보다 작으면 전체 컨텐츠 표시
+        document
+          .querySelector('.btn_open')
+          .classList
+          .add('hide'); // 버튼 감춤
       }
     });
   </script>
-  {% endblock content %}
-  
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document
+        .querySelector('.btn_open')
+        .addEventListener('click', function (e) {
+          const classList = document
+            .querySelector('.all_')
+            .classList;
+          const contentHeight = document
+            .querySelector('.all_ > .content_')
+            .offsetHeight;
+
+          if (classList.contains('showstep2')) {
+            classList.remove('showstep2');
+          }
+
+          if (classList.contains('showstpe1')) {
+            classList.remove('showstep1');
+            if (contentHeight > 600) {
+              classList.add('showstep2');
+            } else {
+              document
+                .querySelector('.btn_open')
+                .classList
+                .add('hide');
+            }
+          }
+
+          if (!classList.contains('showstep1') && !classList.contains('showstep2')) {
+            e
+              .target
+              .classList
+              .add('hide');
+            document
+              .querySelector('.btn_close')
+              .classList
+              .remove('hide');
+          }
+        });
+    });
+
+    document
+      .querySelector('.btn_close')
+      .addEventListener('click', function (e) {
+        e
+          .target
+          .classList
+          .add('hide');
+        document
+          .querySelector('.btn_open')
+          .classList
+          .remove('hide');
+        document
+          .querySelector('.all_')
+          .classList
+          .add('showstep1');
+      });
+
+    window.addEventListener('load', function () {
+      const contentHeight = document
+        .querySelector('.all_ > .content_')
+        .offsetHeight;
+      if (contentHeight <= 300) {
+        document
+          .querySelector('.all_')
+          .classList
+          .remove('showstep1');
+        document
+          .querySelector('.btn_open')
+          .classList
+          .add('hide');
+      }
+    });
+  </script>
+{% endblock content %}
