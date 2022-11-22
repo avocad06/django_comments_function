@@ -1,3 +1,12 @@
 from django.contrib import admin
+from .models import Article, Comment
+from .forms import NewCommentForm
 
-# Register your models here.
+@admin.register(Article)
+class CountryAmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Comment)
+class PostAmin(admin.ModelAdmin):
+    form = NewCommentForm

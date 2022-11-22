@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'accounts',
     'articles',
+    'core',
+    'django.forms',
     'django_bootstrap5',
     'django_extensions',
     'django.contrib.admin',

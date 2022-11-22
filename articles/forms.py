@@ -1,6 +1,6 @@
-from cProfile import label
 from django import forms
 from .models import Article, Comment
+from .widgets import CounterTextInput
 
 class NewPostForm(forms.ModelForm):
     
@@ -15,4 +15,7 @@ class NewCommentForm(forms.ModelForm):
         fields = ("content",)
         labels = {
             'content' : '',
+        }
+        widgets = {
+            'content' : CounterTextInput(attrs={'class': 'form-control', 'title': 'Your name'})
         }

@@ -42,16 +42,13 @@
     <div style="width: 50rem;">
       <!-- axios로 요청 보낼 때 가져올 article.pk data-* -->
       <form id="comment-form" data-article-id="{{ article.pk }}" class="d-flex justify-content-center p-2" style="width: 50rem; background-color: #f9f9f9;">
-        {% if not user.is_authenticated %}
-          <input type="text" placeholder="로그인 후 이용해주세요." class="form-control" disabled="disabled">
-        {% else %}
           {% csrf_token %}
-          <input type="text" name="content" class="w-100 form-control" placeholder="댓글을 입력해주세요." style="height: 3rem;">
+          {{ form.as_p }}
           <div class="ms-2 d-flex align-items-center">
             <input type="submit" class="btn btn-dark h-100" value="등록">
           </div>
         </form>
-      {% endif %}
+
     </div>
   </div>
 
