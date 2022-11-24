@@ -1,39 +1,51 @@
-{% include "django/forms/widgets/clearable_file_input.html" %}
+<!--기존이미지 -->
+<div>
+    <img id='imagePreview' src='{{ value.url }}' style="width: 200px; height: 200px; display: none;" />
+    <button id='imageClearBtn' type='button'>삭제</button>
 
-{{ form.media }}
+    <!-- 기존 ClearableFileInput의 삭제 기능을 활용하기 위해 위에 삭제 버튼을 누르면 체크되도록 하되 안보이게 설정 -->
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" id="chk-{{ name }}" class="form-check-input" name="chk-{{ name }}">
+        <label class="custom-control-label" for="chk-{{ name }}">이미지를 삭제하려면 체크하세요.</label>
+    </div>
 
-<script>
-  $(function () {
-    // file input이 변할 때마다 함수를 실행
-    $('#{{ widget.attrs.id }}').change(function () {
-      // this.files input에 들어간 file들의 list를 불러온다
-      // 사진이 한 장씩만 추가되고 있기 때문에 index를 통해 접근
-      if (this.files[0]) {
-        // file을 읽을 수 있는 filereader 객체를 만들어주고, 이를 읽어준다.
-        const reader = new FileReader();
-        reader.readAsDataURL(this.files[0]);
-        // onload는 파일을 다 읽을 때까지 기다렸다가 함수를 실행하라는 의미
-        reader.onload = function (e) {
-          // e.target.result를 통해 파일을 64진수로 표현할 수 있다
-          $('#preview_{{ widget.attrs.id }}').attr('src', e.target.result);
-        };
-      }
-    })
-  })
-</script>
+    <!-- 파일 업로드 폼 좀 더 예쁘게(선택사항) -->
+    <div class="custom-file">
+        <input type="file" id="{{ id }}" class="form-control text-center" name="{{ name }}" accept="image/*"
+            style="cursor: pointer;">
+    </div>
 
-<script>
-  $(function () {
-    $('#{{ widget.attrs.id }}').change(function () {
+    <!-- 여기서부터 스크립트 -->
+    <script>
+        <!-- 삭제 버튼이 클릭되면 이미지 안보이게 한 후 숨겨진 삭제 체크박스 값 변경 -->
+        document.getElementById('imageClearBtn').addEventListener('click', function (e) {
+            document.getElementById('imagePreview').src = "";
+            document.getElementById('imagePreview').style.display = "none";
+            // 체크박스 값을 True로(체크박스의 checked 속성)
+            document.getElementById('chk-{{ name }}').checked = true;
+        });
 
-      if (this.files[0]) {
-        var reader = new FileReader();
-        reader.readAsDataURL(this.files[0]);
-        reader.onload = function (e) {
-          $('#preview_{{widget.attrs.id}}').attr('src', e.target.result);
-        };
+        // 파일 선택 이벤트 등록
+        var imgFieldCtrl = document.getElementById('{{ id }}')
+        imgFieldCtrl.addEventListener('change', function (e) {
+            // e는 객체다. 이벤트가 발생하는 요소 그 자체에 대한 정보가 담긴 객체다.
+            // Event {isTrusted: true, type: 'change', target: input#id_image.form-control, currentTarget: input#id_image.form-control, eventPhase: 2, …}
+            console.log(e)
+            // 이미지 값이 존재한다면(0이 아니라면)
+            if (imgFieldCtrl.files && imgFieldCtrl.files[0]) {
+                const reader = new FileReader();
+                // 이 함수를 호출할 때 넘겨지는 인자의 이름을 e로 한다
+                // .onload가 될 때의 이벤트에
+                reader.onload = function (e) {
+                    console.log(e)
+                    document.getElementById('imagePreview').src = e.target.result
+                    // display의 이전 속성값인 "none"을 없애준다
+                    document.getElementById('imagePreview').style.display = ""
+                }
 
-      }
-    })
-  })
-</script>
+                // convert to base64 string
+                reader.readAsDataURL(document.getElementById('{{ id }}').files[0]);
+            }
+        });
+    </script>
+</div>

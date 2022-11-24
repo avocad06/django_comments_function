@@ -7,7 +7,7 @@ class Article(models.Model):
     # 모델이 변경되는 거라서 기존에 있던 행들의 user필드의 레코드를 어떻게 처리할 것인지
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
     # 이미지 추가하기
-    # 'imgges/'폴더에 저장하기
+    # 'images/'폴더에 저장하기
     # blank=True 이미지를 선택적으로 업로드할 수 있도록
     image = models.ImageField(blank=True, upload_to='images/')
     
