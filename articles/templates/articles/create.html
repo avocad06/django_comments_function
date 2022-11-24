@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 {% block content %}
-  <form action="" method="POST">
+{% comment %} 이미지 필드 - form에 enc(인코딩)type 속성 지정 {% endcomment %}
+  <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% bootstrap_form forms %}
     <input type="submit" class="btn btn-outline-primary">
