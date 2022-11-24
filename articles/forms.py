@@ -6,7 +6,7 @@ class NewPostForm(forms.ModelForm):
     
     class Meta:
         model = Article
-        fields = ("title", "content",)
+        fields = ("title", "content", "image",)
         
 class NewCommentForm(forms.ModelForm):
     

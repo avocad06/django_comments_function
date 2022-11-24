@@ -8,6 +8,12 @@
         <h2 class="card-title fw-bold">{{ article.title }}</h2>
         <hr>
         <p class="card-text" style="height: 15rem;">{{ article.content }}</p>
+        {% comment %} 이미지 추가 {% endcomment %}
+        {% comment %} 이미지가 있을 때만 {% endcomment %}
+        {% if article.image %}
+        {% comment %} 추가 안 하면 이미지 없는 글에서 오류남 {% endcomment %}
+        <img src="{{ article.image.url }}" alt="">
+        {% endif %}
         <hr>
         <h5>댓글
           <span class="text-primary fw-bold">{{ article.comment_set.all |length }}</span></h5>
