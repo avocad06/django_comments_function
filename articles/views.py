@@ -26,7 +26,9 @@ def detail(request, article_pk):
 
 def create(request):
     if request.method == "POST":
-        forms = NewPostForm(request.POST)
+        # 이미지 파일- request.FILES 객체로 전달
+        # 폼에 넣으려면 인수로 전달
+        forms = NewPostForm(request.POST, request.FILES)
         if forms.is_valid():
             article = forms.save(commit=False)
             article.user = request.user
