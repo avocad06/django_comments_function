@@ -14,6 +14,9 @@
         {% comment %} 추가 안 하면 이미지 없는 글에서 오류남 {% endcomment %}
         <img src="{{ article.image.url }}" alt="">
         {% endif %}
+        <a href="{% url 'articles:like' article.pk %}">
+          좋아요
+        </a>
         <hr>
         <h5>댓글
           <span class="text-primary fw-bold">{{ article.comment_set.all |length }}</span></h5>

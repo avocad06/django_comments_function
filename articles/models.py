@@ -10,6 +10,7 @@ class Article(models.Model):
     # 'images/'폴더에 저장하기
     # blank=True 이미지를 선택적으로 업로드할 수 있도록
     image = models.ImageField(blank=True, upload_to='images/')
+    like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='likes_article')
     
 class Comment(models.Model):
     content = models.CharField(max_length=80)
