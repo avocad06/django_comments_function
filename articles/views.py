@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Article, Comment
 from .forms import NewPostForm, NewCommentForm
 from django.contrib.auth.decorators import login_required
@@ -74,3 +74,18 @@ def comment_delete(request, article_pk, comment_pk):
         return redirect('articles:detail', article_pk)
     else:
         return HttpResponseForbidden()
+
+# 좋아요 기능 구현
+def like(request, article_pk):
+    # 일단 좋아요를 누른 게시글의 article을 가져온다.
+    article = get_object_or_404(Article, pk=article_pk)
+    # 만약 이 게시글을 누른 사용자 중에 유저가 있다면,
+    if article.like_users.filter(pk=request.user.pk).exists():
+        # 유저를 지우고,
+        article.like_users.remove(request.user)
+    
+    # 유저가 없다면,
+    else:
+        # 좋아요에 유저를 추가한다.
+        article.like_users.add(request.user)
+    return redirect('articles:detail', article_pk)
