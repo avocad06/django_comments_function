@@ -83,9 +83,18 @@ def like(request, article_pk):
     if article.like_users.filter(pk=request.user.pk).exists():
         # 유저를 지우고,
         article.like_users.remove(request.user)
+        # json - 좋아요 아닌 상태
+        is_liked = False
     
     # 유저가 없다면,
     else:
         # 좋아요에 유저를 추가한다.
         article.like_users.add(request.user)
-    return redirect('articles:detail', article_pk)
+        # json - 좋아요한 상태
+        is_liked = True
+    # 동기일 때는 return redirect('articles:detail', article_pk)
+    context = {
+        "is_liked" : is_liked,
+        "likeCount" : article.like_users.count()
+    }
+    return JsonResponse(context)
