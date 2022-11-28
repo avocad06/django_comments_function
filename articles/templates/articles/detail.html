@@ -34,7 +34,7 @@
         <span class="fw-light">{{ comment.content }}</span>
       </p>
       {% if user == comment.user %}
-      <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" class="d-inline">
+      <form id="">
         {% csrf_token %}
         <input type="submit" value="삭제" class="btn btn-outline-danger">
       </form>
@@ -154,5 +154,11 @@
       })
 
   })
+</script>
+<script>
+  // 1. 폼에 id값 주고 가져오기
+  const comment_delete_form =
+
+
 </script>
 {% endblock script %}
