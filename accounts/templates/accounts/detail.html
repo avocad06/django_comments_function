@@ -11,50 +11,113 @@
     <p class="fw-bold">{{ us }} </p>
     <p>{{ us.email }}</p>
     {% if request.user.is_authenticated %}
-    <a href="{% url 'accounts:follow' us.pk %}" class="btn btn-outline-primary">
+    <a href="{% url 'accounts:follow' us.pk %}" class="btn btn-outline-primary" id="follow-btn" data-us-id="{{ us.pk }}"
+      onclick="followFunction(this);">
+      {% comment %}
+      1. 팔로우 버튼을 누르면 링크 가지는 기본 이벤트를 제거하고, axios요청
+      2. method : get, url을 요청할 때 필요한 us.pk는 data-us-id 로 가져온다.
+      3. .then {
+
+      }
+      4. views에서 요청이 들어오면, 이미 팔로우 상태이면 request.user를 제거하고 is_followed = False/팔로우면 is_followed=True
+      5. if is_followed = False: follow-btn.innerText = "팔로우"로 변경, is_followed = True: follow-btn.innterText = " 팔로우취소"로
+      변경
+      {% endcomment %}
       {% if request.user not in us.follower.all %}
       팔로우
       {% else %}
       팔로우 취소
       {% endif %}
-    </a><span>팔로워 | {{ us.follower.count }}</span><span>팔로잉 | {{ us.followings.count }}</span>
+    </a>
+    <span id="follower-count">팔로워 | {{ us.follower.count }}</span><span>팔로잉 | {{ us.followings.count }}</span>
     {% else %}
     <a href="{% url 'accounts:follow' us.pk %}" class="btn btn-outline-info">로그인을 해주세요.</a>
     {% endif %}
   </div>
 </header>
+{% comment %} 팔로워목록 {% endcomment %}
+<div id="followers-list">
+  {% for follower in us.follower.all %}
+  <p>{{ follower }}</p>
+  {% endfor %}
+</div>
 <hr>
-  <div class="container p-3 d-flex flex-column align-items-center" style="background-color: #f9f9f9;">
-    <p class="fw-bold text-primary mb-1">{{ user.article_set.all | length }}</p>
-    <p class="fw-bold">작성한 글</p>
-    {% for article in user.article_set.all %}
-      <div class="card mb-3 shadow-sm col" style="border-style: none; width: 30rem;">
-        <div class="row g-0">
-          <div class="col-md-4 d-flex justify-content-center align-items-center">
-            <div class="text-center">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </div>          
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <a href="{% url 'articles:detail' article.pk %}" class="text-decoration-none hver">
-                <h5 class="fw-bold card-title">{{ article.title }}</h5>
-              </a>
-              <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p>
-              <p class="card-text">
-                <small class="text-muted">{{ article.user }}</small>
-              </p>
-            </div>
+<div class="container p-3 d-flex flex-column align-items-center" style="background-color: #f9f9f9;">
+  <p class="fw-bold text-primary mb-1">{{ user.article_set.all | length }}</p>
+  <p class="fw-bold">작성한 글</p>
+  {% for article in user.article_set.all %}
+  <div class="card mb-3 shadow-sm col" style="border-style: none; width: 30rem;">
+    <div class="row g-0">
+      <div class="col-md-4 d-flex justify-content-center align-items-center">
+        <div class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
           </div>
         </div>
       </div>
-    {% endfor %}
+      <div class="col-md-8">
+        <div class="card-body">
+          <a href="{% url 'articles:detail' article.pk %}" class="text-decoration-none hver">
+            <h5 class="fw-bold card-title">{{ article.title }}</h5>
+          </a>
+          <p class="card-text" style="text-overflow: ellipsis;">{{ article.content }}</p>
+          <p class="card-text">
+            <small class="text-muted">{{ article.user }}</small>
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
-  
-  {% endblock %}
-  
-  {% block script %}
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  {% endblock script %}
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  const followFunction = function (e) {
+    // 기본 이벤트 제거하는 법
+    event.preventDefault();
+    console.log(e)
+    const followBtn = document.querySelector('#follow-btn')
+    axios({
+      method: 'get',
+      url: `/accounts/${event.target.dataset.usId}/follow/`
+    })
+      .then(response => {
+        if (response.data.is_followed === false) {
+          followBtn.innerText = "팔로우"
+        } else {
+          followBtn.innerText = "팔로우 취소"
+        }
+        const followerCount = document.querySelector('#follower-count')
+        followerCount.innerText = `팔로워 | ${response.data.follower_count}`
+        const followerList = document.querySelector('#followers-list')
+        // div 안에 있는 텍스트 초기화
+        followerList.textContent = ""
+        const followers_all = response.data.followers_all
+
+        // views에서 보낸 followers_all 을 길이만큼 순환
+        console.log(response.data.followers_all)
+        for (let i = 0; i < followers_all.length; i++) {
+          console.log(response.data.followers_all[i].follower_pk)
+          followerList.insertAdjacentHTML('beforeend',
+            `<a href="/accounts/${response.data.followers_all[i].follower_pk}/">
+            <p> ${response.data.followers_all[i].follower}</p>
+          </a>`)
+        }
+      })
+
+      {% comment %} 
+      1. 수정 버튼에 id="comment_update" data-comment-id="{{ comment.pk }}" onclick="commentUpdate(this);" 주기
+      2. 댓글 수정 버튼을 누르면 submit 이벤트를 제거하고 axios요청하기
+      3. const commentUpdate = function(e) {
+        event.preventDefault();
+      } 
+      4. axios
+      {% endcomment %}
+
+
+  }
+</script>
+{% endblock script %}

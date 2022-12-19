@@ -22,3 +22,72 @@
     width: 100%;
     transition: all 0.2s linear;
 }
+header {
+    height: 65px;
+}
+/* 네비게이션바 */
+nav {
+    width: 100%;
+    height: 70px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background-color: white;;
+    backdrop-filter: blur(1px);
+}
+
+footer {
+    width: 100%;
+    height: 60px;
+}
+
+
+
+.none {
+    display: none;
+}
+/* 내려가는 애니메이션 */
+@keyframes slide-1 {
+    0%{
+      transform: translateY(0px)
+    }
+    100%{
+      transform: translateY(50px)
+    }
+  }
+  /* 올라오는 애니메이션 */
+  @keyframes slide-2 {
+    0%{
+      transform: translateY(50px)
+    }
+    100%{
+      transform: translateY(0px)
+    }
+  }
+  /* 올라올 때 */
+
+  .fix {
+    visibility: visible;
+    position:fixed;
+    animation: slide-2 0.5s ease
+  }
+  /* 내려갈 때 */
+
+  .removed {
+    animation: slide-1 0.5s ease;
+    animation-fill-mode: forwards;
+}
+  
+
+.hover-item {
+  height: 300px;
+  background: lightpink;
+}
+.hover-item:hover ~ .none-item {
+    display: none;
+  }
+
+.none-item {
+  height: 200px;
+  background: blueviolet;
+}

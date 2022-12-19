@@ -7,7 +7,7 @@
       <p class="h-5">{{ article.user }}</p>
       <h2 class="card-title fw-bold">{{ article.title }}</h2>
       <hr>
-      <p class="card-text" style="height: 15rem;">{{ article.content }}</p>
+      <p class="card-text" style="min-height: 15rem;">{{ article.content }}</p>
       {% comment %} 이미지 추가 {% endcomment %}
       {% comment %} 이미지가 있을 때만 {% endcomment %}
       {% if article.image %}
@@ -19,6 +19,9 @@
       </a>
       <span id="like-count">{{ article.like_users.count }}
       </span>
+      <footer id="footer">
+        푸터
+      </footer>
       <hr>
       <h5>댓글
         <span class="text-primary fw-bold">{{ article.comment_set.all | length }}</span>
@@ -28,18 +31,32 @@
       <p>
         <!-- 새로 axios에 의해 생성되는 div를 담을 div -->
       <div id="comments"></div>
+      <!-- 하지만 전체 댓글을 보여주는 목록은 여기 -->
       {% for comment in article.comment_set.all %}
       <p>
-      <p class="fw-bold">{{ comment.user }}
-        <span class="fw-light">{{ comment.content }}</span>
-      </p>
-      {% if user == comment.user %}
-      <form id="">
-        {% csrf_token %}
-        <input type="submit" value="삭제" class="btn btn-outline-danger">
-      </form>
-      {% endif %}
-      <hr>
+      <div id="comments-{{ comment.pk }}">
+        <p class="fw-bold">{{ comment.user }}
+          <span id="comment_base" class="fw-light">{{ comment.content }}</span>
+          {% if user == comment.user %}
+        <form id="comment_update_form" data-comment-id="{{ comment.pk }}" data-article-id="{{ article.pk }}">
+          {% csrf_token %}
+          <span id="comment_update_span" class="d-none">
+            <input required type="text" value="{{ comment.content }}" class="form-control" style="width: 100%;"
+              name="content">
+            <input type="submit" value="등록" class="btn btn-outline-danger">
+        </form>
+        {% endif %}
+        </span>
+        </p>
+        {% if user == comment.user %}
+        <form id="comment_delete_form" data-comment-id="{{ comment.pk }}" data-article-id="{{ article.pk }}">
+          {% csrf_token %}
+          <input type="submit" value="삭제" class="btn btn-outline-danger">
+        </form>
+        <input id="update_btn" type="submit" value="수정" class="btn btn-outline-danger">
+        {% endif %}
+        <hr>
+      </div>
       </p>
       <!-- 댓글이 없다면 -->
       {% empty %}
@@ -61,7 +78,6 @@
         <input type="submit" class="btn btn-dark h-100" value="등록">
       </div>
     </form>
-
   </div>
 </div>
 
@@ -111,8 +127,9 @@
         // 템플릿에서 보낸 변수
         p.innerText = `${response.data.userName}`
         p.classList.add("fw-bold");
-        span.innerText = `  ${response.data.content}`
+        span.innerText = `${response.data.content}`
         const hr = document.createElement('hr')
+        comments.insertAdjacentHTML('beforeend', '<button class="btn btn-outline-danger">삭제</button>')
         p.appendChild(span)
         // 댓글이 쓰인 p 태그를 댓글을 담는 빈 div의 자식요소로 --> x
         // 어떻게 출력되는지 확인해보자
@@ -122,8 +139,7 @@
         form.reset();
       });
   });
-</script>
-<script>
+
   const likeBtn = document.querySelector('#like-btn')
   // click 이벤트가 발생하면, evevnt 객체를 인자로 받는 함수 실행
   // (이 함수는 기본 이벤트를 제거하고, axios 요청하는 함수이다.)
@@ -154,10 +170,60 @@
       })
 
   })
-</script>
-<script>
-  // 1. 폼에 id값 주고 가져오기
-  const comment_delete_form =
+
+  // 1. 폼에 id값 주고 가져오기(모든 삭제 버튼 가져오기)
+  const CommentDeleteForms = document.querySelectorAll('#comment_delete_form');
+  CommentDeleteForms.forEach((CommentDelForm) => {
+    CommentDelForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      axios({
+        method: 'post',
+        url: `/articles/${event.target.dataset.articleId}/comments/${event.target.dataset.commentId}/delete/`,
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      })
+        .then(response => {
+          const Comment = document.querySelector(`#comments-${response.data.comment_pk}`)
+          console.log(Comment)
+          Comment.remove();
+        })
+    })
+  })
+
+  // 업데이트 폼 나오게 하기
+  const updateBtn = document.querySelector('#update_btn')
+  const commentBase = document.querySelector('#comment_base')
+  updateBtn.addEventListener('click', function () {
+    const commentUpdateSpan = document.querySelector('#comment_update_span')
+    commentBase.classList.toggle('d-none')
+    commentUpdateSpan.classList.remove('d-none')
+    updateBtn.classList.toggle('d-none')
+  })
+
+  const commentUpdateForm = document.querySelector('#comment_update_form')
+
+  commentUpdateForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    axios({
+      method: 'POST',
+      url: `/articles/${e.target.dataset.articleId}/comments/${e.target.dataset.commentId}/update/`,
+      headers: {
+        'X-CSRFToken': csrftoken
+      },
+      data: new FormData(commentUpdateForm)
+    })
+      .then(response => {
+        commentBase.innerText = `${response.data.content}`
+        const commentUpdateSpan = document.querySelector('#comment_update_span')
+        commentBase.classList.remove('d-none')
+        commentUpdateSpan.classList.toggle('d-none')
+        updateBtn.classList.remove('d-none')
+      })
+  })
+
 
 
 </script>

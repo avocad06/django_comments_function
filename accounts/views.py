@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from .forms import SignoutForm
 
 # Create your views here.
@@ -62,13 +62,28 @@ def signout(request):
 def follow(request, user_pk):
     user = get_user_model()
     us = get_object_or_404(user, pk=user_pk)
+
     if not request.user == us:
         if request.user in us.follower.all():
             print("no")
             us.follower.remove(request.user)
+            is_followed = False
         else:
             print("yes")
             us.follower.add(request.user)
-        return redirect('accounts:detail', user_pk)
+            is_followed = True
+        followers = us.follower.all()
+        print(followers)
+        # 팔로워들을 담을 변수
+        followers_all = []
+        for follower in followers:
+            followers_all.append({
+                "follower": follower.username,
+                "follower_pk" : follower.pk
+                })
+            print(followers_all)
+        return JsonResponse({"is_followed": is_followed,
+                             "follower_count" : us.follower.count(),
+                             "followers_all" : followers_all,})
     else:
         return HttpResponseForbidden()
