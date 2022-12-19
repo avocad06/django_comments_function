@@ -16,7 +16,7 @@ def index(request):
 def detail(request, article_pk):
     article = Article.objects.get(pk=article_pk)
     comment_form = NewCommentForm()
-    comments = article.comment_set.all()
+    comments = article.comment_set.all()        
     context = {
         "article" : article,
         "form" : comment_form, 
@@ -65,16 +65,17 @@ def comment_create(request, article_pk):
     
 
 @login_required
-def comment_delete(request, comment_pk):
+def comment_delete(request, article_pk, comment_pk):
     # 요청한 유저와 게시글 작성자의 pk가 일치해야 한다.
     # article = Article.objects.get(pk=article_pk)
-    if request.user == article.user:
-        comment = get_object_or_404(pk=comment_pk)
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    print(request)
+    if request.user == comment.user:
         comment.delete()
         context = {
-            "comment_pk" : comment.pk
+            "comment_pk" : comment_pk,
         }
-        return JsonResponse()
+        return JsonResponse(context)
         # return redirect('articles:detail', article_pk)
     else:
         return HttpResponseForbidden()
@@ -102,3 +103,19 @@ def like(request, article_pk):
         "likeCount" : article.like_users.count()
     }
     return JsonResponse(context)
+
+def comment_update(request, article_pk, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    if request.method == "POST":
+        print(request.POST)
+        comment.content = request.POST["content"]
+            # 이 시점에는 모델'폼'의 인스턴스, 객체를 반환
+            # 이 시점에서는 '모델'의 인스턴스를 반환
+        comment.save()
+        print("hi")
+        context = {
+            # json으로 응답할 때 담아갈 변수
+            'content' : comment.content,
+            'userName' : comment.user.username,
+        }
+        return JsonResponse(context)
